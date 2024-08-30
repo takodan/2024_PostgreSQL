@@ -35,8 +35,9 @@ CREATE USER account_name WITH PASSWORD 'password';
 CREATE DATABASE people WITH OWNER 'account_name';
 \q # quit psql
 ```
+`psql -d [database] -U [user] -p [port] -h [host]`
 ```bash
-psql -U account_name # start psql as a user "account_name"
+psql -U account_name # start psql database "account_name" as a user "account_name"
 
 # create a table
 CREATE TABLE users(
