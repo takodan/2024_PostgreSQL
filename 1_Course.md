@@ -168,22 +168,106 @@ CREATE TABLE users(
     1. Hash_function(Keys) = Hashes
     2. super fast, but only good for exact match (like PRIMARY KEY or GUID)
 
-### ASSESSMENT
+### ASSIGNMENT_1
+
+
+## Module 3 One-To-Many Data Models
+### Database Design
+1. don't put the same string in twice (vertical replication); use a relationship instead
+2. the interface can have vertical replication, just don't have it in the database
+3. to design a database, first, you need to decide whether the column of data is an object or an attribute of another object.
+4. the first table usually is users in many application databases
+### Keys
+1. Primary key: generally an integer auto-increment field. (e.g. id)
+2. Logical key: what the outside word uses for searching. (e.g., name, email)
+3. Foreign key: generally an integer key pointing to a row in another table. (e.g., table2_id)
+### Normalization (very simplify version of 3NF)
+1. Do not replicate data. Instead, reference data, point at data.
+2. Use integers for keys
+3. Add a special key column to references to 
+### EXAMPLE: Music Database
+1. Creating Database
 ```sql
-CREATE TABLE automagic(
+CREATE DATABASE music WITH OWNER 'pg4e' ENCODING 'UTF8'
+```
+2. Creating Tables
+```sql
+CREATE TABLE artist (
     id SERIAL,
-    name VARCHAR(32) NOT NULL,
-    height REAL NOT NULL
+    name VARCHAR(128) UNIQUE,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE album (
+    id SERIAL,
+    title VARCHAR(128) UNIQUE,
+    artist_id INTEGER REFERENCES artist(id) ON DELETE CASCADE,
+    -- ON DELETE CASCADE: Delete the rows when REFERENCES rows are deleted
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE genre (
+    id SERIAL,
+    name VARCHAR(128) UNIQUE,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE track (
+    id SERIAL,
+    title VARCHAR(128),
+    len INTEGER,
+    rating INTEGER,
+    count INTEGER,
+    album_id INTEGER REFERENCES album(id) ON DELETE CASCADE,
+    genre_id INTEGER REFERENCES genre(id) ON DELETE CASCADE,
+    -- combination of (title, album_id) must be unique
+    UNIQUE(title, album_id)
+
+    PRIMARY KEY(id)
 );
 ```
+3. Inserting Data
 ```sql
-CREATE TABLE track_raw(
-    title TEXT, artist TEXT, album TEXT,
-    count INTEGER, rating INTEGER, len INTEGER
-);
+-- the id is a serial field (automatically generated)
+INSERT INTO artist (name) VALUES ('Led Zeppelin');
 
-\copy track_raw(title,artist,album,count,rating,len) FROM 'library.csv' WITH DELIMITER ',' CSV;
+-- even artist_id is REFERENCES to id, it isn't generated automatically 
+INSERT INTO album (title, artist_id) VALUES ('IV', 1);
 
-SELECT title, album FROM track_raw ORDER BY title LIMIT 3;
+INSERT INTO genre (name) VALUES ('ROCK');
+
+INSERT INTO track (title, rating, len, count, album_id, genre_id)
+    VALUES ('Black Dog', 5, 297, 0, 1, 1);
 ```
 
+4. Join
+```sql
+-- INNER JOIN
+-- what we want to see
+SELECT album.title, artist.name
+    -- The tables that hold the data
+    FROM album JOIN artist
+    -- How the tables are linked
+    ON album.artist_id = artist.id;
+
+-- CROSS JOIN
+-- shows all the combinations
+SELECT track.title, track.genre_id, genre.id, genre.name
+    FROM track CROSS JOIN genre
+
+```
+
+5. `REFERENCES ON DELETE` Choices
+    1. RESTRICT (DEFAULT): don't allow changes
+    2. CASCADE: Adjust child rows by removing or updating
+    3. SET NULL
+
+
+INSERT INTO make (name) VALUES ('Chevrolet');
+INSERT INTO make (name) VALUES ('Mercedes-Benz');
+
+INSERT INTO model (name, make_id) VALUES ('Tahoe K1500 4WD', 1);
+INSERT INTO model (name, make_id) VALUES ('Tracker 2WD Convertible', 1);
+INSERT INTO model (name, make_id) VALUES ('Tracker 2WD Hardtop', 1);
+INSERT INTO model (name, make_id) VALUES ('E320 (Wagon)', 2);
+INSERT INTO model (name, make_id) VALUES ('E320 4Matic', 2);
