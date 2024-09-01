@@ -263,11 +263,29 @@ SELECT track.title, track.genre_id, genre.id, genre.name
     3. SET NULL
 
 
-INSERT INTO make (name) VALUES ('Chevrolet');
-INSERT INTO make (name) VALUES ('Mercedes-Benz');
+## Module 4 Many-To-Many Data Models
+1. Create a Junction (Join) Table between two Many-To-Many Tables
+2. Both tables with have One-To-Many relation with Junction Table
+```sql
+CREATE TABLE student (
+    id SERIAL,
+    name VARCHAR(128),
+    email VARCHAR(128) UNIQUE,
+    PRIMARY KEY(id)
+);
 
-INSERT INTO model (name, make_id) VALUES ('Tahoe K1500 4WD', 1);
-INSERT INTO model (name, make_id) VALUES ('Tracker 2WD Convertible', 1);
-INSERT INTO model (name, make_id) VALUES ('Tracker 2WD Hardtop', 1);
-INSERT INTO model (name, make_id) VALUES ('E320 (Wagon)', 2);
-INSERT INTO model (name, make_id) VALUES ('E320 4Matic', 2);
+CREATE TABLE course (
+    id SERIAL,
+    title VARCHAR(128) UNIQUE,
+    PRIMARY KEY(id)
+);
+
+-- We want they have a Many-To-Many relation
+
+CREATE TABLE member (
+    student_id INTEGER REFERENCES student(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES course(id) ON DELETE CASCADE,
+    role INTEGER,
+    PRIMARY KEY (student_id, course_id)
+);
+```
