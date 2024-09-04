@@ -70,7 +70,7 @@ INSERT INTO ages (name, age) VALUES ('Rochelle', 16);
 ### PostgreSQL commands
 1. Insert
 ```sql
-INSERT INTO table_name (column_1, column_2) VALUE ('value_1', 'value_2');
+INSERT INTO table_name (column_1, column_2) VALUES ('value_1', 'value_2');
 ```
 2. Delete
     1. From an abstract perspective, database seems loop through a table.
@@ -94,7 +94,7 @@ SELECT * FROM table_name ORDER BY column_1 DESC;
 ```
 6. LIKE
 ```sql
-SELECT * FROM table_name WHERE column_1 Like '%e%'
+SELECT * FROM table_name WHERE column_1 LIKE '%e%'
 ```
 7. LIMIT/OFFSET
     1. request 'n' rows, or 'n' rows after skipping some rows. It's like paging.
