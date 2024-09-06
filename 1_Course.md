@@ -32,7 +32,7 @@ psql -U postgres # start psql as a super user "postgres"
 
 \l # list database
 CREATE USER account_name WITH PASSWORD 'password';
-CREATE DATABASE people WITH OWNER 'account_name';
+CREATE DATABASE database_name WITH OWNER account_name;
 \q # quit psql
 ```
 `psql -d [database] -U [user] -p [port] -h [host]`
@@ -48,6 +48,8 @@ CREATE TABLE users(
 \dt # display tables in the database
 \d+ users # display "users" table with the schema
 \i file.sql # run commands from file.sql
+\copy table_name FROM 'file.txt' # copy file as data into the table
+\copy table_name FROM with delimiter E'\007' # delimiter E'\007' is bell. this command keeps the input data together.
 ```
 
 ### ASSESSMENT: Inserting Some Data into a Table

@@ -6,3 +6,5 @@
     - https://www.postgresql.org/docs/current/sql-select.html#SQL-FOR-UPDATE-SHARE
 4. \copy command
     - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL.Procedural.Importing.Copy.html.
+5. LIKE, RegEx in postgreSQL
+    - https://www.postgresql.org/docs/current/functions-matching.html
