@@ -38,6 +38,8 @@
         2. Stemming: a technique used to reduce words to their root form.
     5. Example in `3_Demonstration_1.sql`
 
+
+
 ## Module 2 Inverted Indexes with PostgreSQL
 1. Generalized Inverse Index (GIN)
     1. Advantages: exact matches, efficient on lookup/search. 
@@ -57,4 +59,91 @@
     -- is to_tsquery(...) in to_tsvector(...)? return 't' or 'f'
     SELECT to_tsquery('english', 'teaching') @@ to_tsvector('english', 'UMSI also teaches Python and also SQL');
     ```
-6. Example in `3_Demonstration_2.sql`
+6. `<->` operator
+    ```sql
+    -- follow by
+    SELECT count(column1) FROM table_name WHERE to_tsquery('english', 'tiny <-> tim') @@ to_tsvector('english', column1);
+    ```
+7. Example in `3_Demonstration_2.sql`
+8. More `ts` operators in `3_Demonstration_3.sql`
+
+
+
+## Module 3 Python and PostgreSQL
+1. psycopg2
+```py
+conn = psycopg2.connect(host=secrets['host'],
+        port=secrets['port'],
+        database=secrets['database'], 
+        user=secrets['user'], 
+        password=secrets['pass'], 
+        connect_timeout=3)
+cur = conn.cursor()
+
+sql = 'DROP TABLE IF EXISTS pythonfun CASCADE;'
+print(sql)
+cur.execute(sql)
+
+conn.commit()
+```
+2. Demonstration: Loading The Text of a Book
+    1. `loadbook.py`
+    2. file_name as the table_name
+    3. every paragraph as a row
+    4. `commit()` every 50 rows
+    5. print "loaded..." every 100 rows
+
+
+3. Demonstration: Loading Email Data
+    1. `gmane.py`, `datecompat.py`
+    2. catch ctrl c so the program can commit SQL before it stop
+    ```py
+    try:
+        pass
+    except KeyboardInterrupt:
+        print('')
+        print('Program interrupted by user...')
+        break
+    ```
+    3. most of the code is used to clean text data (using Regex)before it is stored in SQL
+    4. sql substring
+    ```sql
+    -- substring
+    SELECT substring('hello@example.com' FROM '([^@]+)') AS username;
+    ```
+    5. `ts_rank`
+        - https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
+
+
+
+## Module 4 JSON and PostgreSQL
+1. timeline: HTML -> XML -> AJAX -> JSON
+2. JSON is suitable for data with a key-value structure.
+3. JSON in Python
+```py
+import json
+
+data = {}
+
+# Serialize dictionary to JSON
+print(json.dumps(data, indent=4))
+
+# Deserialize JSON to dictionary
+info = json.loads(data)
+```
+4. key/value data in PostgreSql
+    1. hstore: like a Python dictionary without support for nested data structures
+    2. JSON: JSON-like TEXT columns
+    3. JSONB: completely new column type that stores the parsed JSON
+```sql
+CREATE TABLE table_name (id SERIAL, body JSONB);
+
+-- to copy a file into data base as json, using CSV with an irrelevant non-printing character as QUOTE and DELIMITER
+-- E'\x01' is ASCII number 1, E'\x02' is ASCII number 2  
+\copy table_name (body) FROM 'json_file.jstxt' WITH CSV QUOTE E'\x01' DELIMITER E'\x02';
+
+-- `->>` covert JSONB to TEXT
+SELECT body->>'name' FROM table_name LIMIT 5;
+
+```
+
